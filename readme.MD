@@ -70,6 +70,20 @@ The FAQ Management System is a Node.js application designed to manage frequently
 3. Ensure code adheres to project standards.
 4. Submit a pull request with a clear description of changes.
 
+## **Example API Usage**
+```bash
+# Fetch FAQs in English (default)
+curl http://localhost:8000/api/faqs/
+
+# Fetch FAQs in Hindi
+curl http://localhost:8000/api/faqs/?lang=hi
+
+# Fetch FAQs in Bengali
+curl http://localhost:8000/api/faqs/?lang=bn
+```
+
+--- 
+
 > current issue:
 
 -   getting rate limited by google translate's unofficial node_module
