@@ -1,20 +1,35 @@
 import FAQ from '../models/faqModel.js';
+import redis from '../config/redis.js'
 import tranlationService from '../services/tranlationService.js';
 
 export const getFaq = async (req, res) => {
     // fallback to English if translation is unavailable
     const languageCode = req.query.languageCode || 'en';
+
     try {
+        const cachedFaqs = await redis.get(`faqs_${languageCode}`);
+
+        if (cachedFaqs) {
+            return res.json(JSON.parse(cachedFaqs));
+        }
+
         const faqs = await FAQ.find();
         const translatedFaqs = faqs.map((faq) => ({
             id: faq._id,
-            ...faq.getTranslatedText(languageCode),
+            question: faq.getTranslatedText(languageCode).question,
+            answer: faq.getTranslatedText(languageCode).answer,
         }));
+
+        await redis.setex(
+            `faqs_${languageCode}`,
+            3600,
+            JSON.stringify(translatedFaqs)
+        );
 
         return res.json(translatedFaqs);
     } catch (error) {
         res.status(500).json({
-            error: `Failed to fetch FAQs ${error.message}`,
+            error: `Failed to fetch FAQs: ${error.message}`,
         });
     }
 };
@@ -53,6 +68,11 @@ export const createFaq = async (req, res) => {
 
         newFaq.translations = translation;
         await newFaq.save();
+
+        await redis.del('faqs_en');
+        await redis.del('faqs_hi');
+        await redis.del('faqs_bn');
+
         res.status(500).json(newFaq);
     } catch (error) {
         console.error(error);
