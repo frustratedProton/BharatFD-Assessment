@@ -1,8 +1,9 @@
 import express from 'express';
-import { getFaq } from '../controllers/faqController';
+import { createFaq, getFaq } from '../controllers/faqController.js';
 
 const faqRouter = express.Router();
 
-faqRouter.get('/', getFaq);
+faqRouter.post('/faq', createFaq);
+faqRouter.get('/faq', getFaq);
 
 export default faqRouter;

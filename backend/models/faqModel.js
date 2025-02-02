@@ -12,12 +12,12 @@ const faqSchema = new mongoose.Schema({
     },
 
     translations: {
-        hi: {
-            type: String,
+        type: Map,
+        of: {
+            question: { type: String },
+            answer: { type: String },
         },
-        bn: {
-            type: String,
-        },
+        default: {},
     },
 });
 
